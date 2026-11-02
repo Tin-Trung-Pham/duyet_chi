@@ -136,6 +136,38 @@
     });
   });
 
+  describe('móc homeExtras: nội dung bổ sung dưới Trang chủ của Quản lý', function () {
+    function extras() {
+      var log = { mounts: [], destroys: [] };
+      return { log: log, fn: function (el, ctx) { var rec = { el: el, ctx: ctx }; log.mounts.push(rec); el.innerHTML = '<p class="x-extra">phần bổ sung</p>'; return { destroy: function () { log.destroys.push(rec); el.innerHTML = ''; } }; } };
+    }
+    itApp('Quản lý: được gắn một lần vào vùng home-extras, nhận phiên Quản lý', async function () {
+      var x = extras(), h = mountApp({ session: MGR, homeExtras: x.fn }); assert.equal(x.log.mounts.length, 1); assert.equal(x.log.mounts[0].el, h.q('[data-role="home-extras"]')); assert.deepEqual(x.log.mounts[0].ctx.session, MGR); assert.ok(h.q('.x-extra'));
+    });
+    itApp('Nhân viên: KHÔNG được gắn', async function () { var x = extras(), h = mountApp({ session: E1, homeExtras: x.fn }); assert.equal(x.log.mounts.length, 0); assert.equal(h.q('.x-extra'), null); });
+    itApp('không truyền homeExtras: Trang chủ vẫn bình thường', async function () { var h = mountApp({ session: MGR }); assert.ok(h.q('[data-role="home-extras"]')); assert.equal(h.q('[data-role="home-extras"]').innerHTML, ''); });
+    itApp('rời Trang chủ thì hủy; quay lại thì gắn lại', async function () {
+      var x = extras(), h = mountApp({ session: MGR, homeExtras: x.fn }); h.link('duyet').click(); assert.equal(x.log.destroys.length, 1); assert.equal(h.q('.x-extra'), null); h.link('home').click(); assert.equal(x.log.mounts.length, 2); assert.ok(h.q('.x-extra'));
+    });
+    itApp('không gắn ở các màn khác', async function () { var x = extras(), h = mountApp({ session: MGR, homeExtras: x.fn, path: '/thong-ke' }); assert.equal(x.log.mounts.length, 0); });
+    itApp('khi dữ liệu đổi: số liệu Trang chủ cập nhật nhưng phần bổ sung KHÔNG bị gắn lại và giữ nguyên nội dung', async function () {
+      var x = extras(), h = mountApp({ session: MGR, homeExtras: x.fn }), host = h.q('[data-role="home-extras"]'), node = h.q('.x-extra'); var all = JSON.parse(h.storage.m[K.DN]); all.push(req({ tt: 'da_duyet', dg: 50000 })); h.storage.m[K.DN] = JSON.stringify(all); h.dataChanged('entry');
+      assert.equal(h.text('[data-role="kpi-approved"]'), '2.450.000 ₫'); assert.equal(x.log.mounts.length, 1); assert.equal(x.log.destroys.length, 0); assert.equal(h.q('[data-role="home-extras"]'), host); assert.equal(h.q('.x-extra'), node, 'cùng một nút DOM');
+    });
+    itApp('đổi vai trò sang Nhân viên: hủy phần bổ sung; đổi lại Quản lý: gắn lại', async function () {
+      var x = extras(), h = mountApp({ session: MGR, homeExtras: x.fn }); h.openMenu(); h.pickRole(h.menu(), 'nhan_vien'); h.pickWho(h.menu(), 'nv1'); h.q('[data-act="apply"]').click(); assert.equal(x.log.destroys.length, 1); assert.equal(h.q('.x-extra'), null);
+      h.openMenu(); h.pickRole(h.menu(), 'quan_ly'); h.q('[data-act="apply"]').click(); assert.equal(x.log.mounts.length, 2); assert.ok(h.q('.x-extra'));
+    });
+    itApp('homeExtras ném lỗi: Trang chủ vẫn hiển thị đầy đủ, vùng bổ sung trống', async function () {
+      var h = mountApp({ session: MGR, homeExtras: function () { throw new Error('hỏng'); } }); assert.equal(h.text('[data-role="greeting"]'), 'Xin chào, Quản lý'); assert.ok(h.q('[data-short="duyet"]')); assert.equal(h.q('[data-role="home-extras"]').innerHTML, '');
+      h.dataChanged('entry'); assert.ok(h.q('[data-short="duyet"]'));
+    });
+    itApp('destroy khung cũng hủy phần bổ sung; trả về không có destroy cũng không lỗi', async function () {
+      var x = extras(), h = mountApp({ session: MGR, homeExtras: x.fn }); h.app.destroy(); assert.equal(x.log.destroys.length, 1);
+      var g = mountApp({ session: MGR, homeExtras: function () { return undefined; } }); g.link('duyet').click(); assert.equal(g.route(), 'duyet');
+    });
+  });
+
   describe('không va chạm tên với module con', function () {
     function clashModules(log) {
       var m = stubModules(log);

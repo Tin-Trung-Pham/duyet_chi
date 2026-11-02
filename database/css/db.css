@@ -1,0 +1,97 @@
+/* Panel Tổng hợp chi từ cơ sở dữ liệu – tiền tố .db-, chỉ dùng token (DESIGN 2–6, 9, 14). */
+.db-root { color-scheme: light dark; scrollbar-width: thin; margin-top: 32px; font-family: var(--font); font-size: 15px; line-height: 22px; color: var(--text); }
+.db-root *, .db-root *::before, .db-root *::after { box-sizing: border-box; }
+.db-root [hidden] { display: none !important; }
+.db-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); border: 0; white-space: nowrap; }
+.db-root :is(button, select, [tabindex]):focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.db-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 12px; }
+.db-title { margin: 0; font-size: 17px; line-height: 24px; font-weight: 600; flex: 1 1 auto; }
+.db-conn { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 0 10px; font-size: 13px; font-weight: 500; color: var(--text); background: var(--surface-2); border-radius: 999px; font-variant-numeric: tabular-nums; }
+.db-conn.is-bad { color: var(--status-pending); background: var(--status-pending-soft); }
+.db-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 14px; font: inherit; font-size: 14px; font-weight: 600; color: var(--text); background: var(--surface-2); border: 1px solid transparent; border-radius: 10px; cursor: pointer; }
+.db-note { padding: 16px; font-size: 14px; color: var(--status-pending); background: var(--status-pending-soft); border-radius: 14px; }
+.db-note p { margin: 0 0 8px; }
+.db-note p:last-child { margin-bottom: 0; }
+.db-note code { padding: 1px 6px; font-size: 13px; background: var(--surface); color: var(--text); border-radius: 6px; overflow-wrap: anywhere; }
+.db-empty { margin: 0; padding: 16px; text-align: center; color: var(--text-muted); background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+
+/* ---- Cảnh báo > 100 triệu ---- */
+.db-warn { margin-bottom: 16px; padding: 14px 16px; color: var(--status-pending); background: var(--status-pending-soft); border: 1px solid var(--status-pending); border-radius: 14px; }
+.db-warn-head { display: flex; align-items: center; gap: 8px; font-size: 15px; line-height: 22px; }
+.db-warn-head svg { flex: 0 0 auto; }
+.db-warn-list { margin: 8px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; font-size: 14px; line-height: 20px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.db-warn-list li { padding-left: 28px; }
+.db-flag { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; padding: 0 8px; min-height: 22px; font-size: 12px; font-weight: 600; line-height: 16px; color: var(--status-pending); background: var(--status-pending-soft); border: 1px solid var(--status-pending); border-radius: 999px; white-space: nowrap; }
+
+/* ---- KPI ---- */
+.db-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.db-kpi { padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; min-width: 0; }
+.db-kpi[data-kpi="over"] { border-left: 4px solid var(--status-pending); }
+.db-kpi-label { margin: 0; font-size: 13px; line-height: 18px; font-weight: 500; color: var(--text-muted); }
+.db-kpi-val { font-size: 22px; line-height: 28px; font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.db-kpi-sub { font-size: 12px; line-height: 16px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+/* ---- Thẻ, biểu đồ ---- */
+.db-card { position: relative; padding: 16px; margin-bottom: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+.db-sub { margin: 0 0 12px; font-size: 15px; line-height: 22px; font-weight: 600; }
+.db-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0 0 12px; padding: 0; list-style: none; font-size: 13px; }
+.db-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.db-dot { width: 12px; height: 12px; border-radius: 3px; }
+.db-dot-cho_duyet, .db-seg-cho_duyet { background: var(--status-pending); fill: var(--status-pending); }
+.db-dot-da_duyet, .db-seg-da_duyet { background: var(--status-approved); fill: var(--status-approved); }
+.db-dot-tu_choi, .db-seg-tu_choi { background: var(--status-rejected); fill: var(--status-rejected); }
+.db-chart { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.db-crow { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "name amt" "bar bar"; gap: 4px 12px; align-items: center; }
+.db-cname { grid-area: name; font-size: 14px; font-weight: 500; overflow-wrap: anywhere; }
+.db-camt { grid-area: amt; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.db-cbar { grid-area: bar; display: block; width: 100%; height: 14px; border-radius: 4px; overflow: hidden; }
+.db-track { fill: var(--surface-2); }
+.db-seg { transform-origin: left; animation: db-growx 400ms var(--ease); }
+@keyframes db-growx { from { transform: scaleX(0); } }
+
+/* ---- Bảng ---- */
+.db-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 12px; }
+.db-tools .db-sub { margin: 0; flex: 1 1 100%; }
+.db-seg-btns { display: inline-flex; flex-wrap: wrap; padding: 2px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; max-width: 100%; }
+.db-seg-btns button { min-height: 40px; padding: 0 12px; font: inherit; font-size: 14px; font-weight: 600; color: var(--text); background: transparent; border: 0; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+.db-seg-btns button[aria-pressed="true"] { background: var(--primary); color: var(--primary-contrast); }
+.db-count { font-variant-numeric: tabular-nums; font-weight: 500; }
+.db-sortlab { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); }
+.db-select { height: 44px; max-width: 100%; padding: 0 12px; font: inherit; font-size: 15px; color: var(--text); background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; }
+.db-table { width: 100%; border-collapse: collapse; }
+.db-table th { padding: 8px 10px; font-size: 13px; line-height: 18px; font-weight: 500; text-align: left; color: var(--text-muted); border-bottom: 1px solid var(--border); white-space: nowrap; }
+.db-table td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: middle; font-variant-numeric: tabular-nums; }
+.db-table .db-num { text-align: right; }
+.db-table tbody tr:last-child td { border-bottom: 0; }
+.db-table tr.is-over td { background: var(--status-pending-soft); }
+.db-table tr.is-over td:first-child { box-shadow: inset 4px 0 0 var(--status-pending); }
+.db-c-amt { white-space: nowrap; font-weight: 600; }
+.db-c-amt .db-flag { display: flex; width: max-content; margin: 4px 0 0 auto; }
+.db-table tr.is-over .db-badge { box-shadow: inset 0 0 0 1px var(--status-pending); }
+.db-badge { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; font-size: 13px; font-weight: 500; border-radius: 999px; white-space: nowrap; }
+/* Chữ huy hiệu dùng --text (không dùng màu trạng thái): --status-approved trên --status-approved-soft chỉ đạt 4,35:1 (< 4,5:1). Nhận biết bằng nền + biểu tượng màu trạng thái + chữ. */
+.db-badge { color: var(--text); }
+.db-badge svg { flex: 0 0 auto; }
+.db-badge-cho_duyet { background: var(--status-pending-soft); }
+.db-badge-cho_duyet svg { color: var(--status-pending); }
+.db-badge-da_duyet { background: var(--status-approved-soft); }
+.db-badge-da_duyet svg { color: var(--status-approved); }
+.db-badge-tu_choi { background: var(--status-rejected-soft); }
+.db-badge-tu_choi svg { color: var(--status-rejected); }
+
+@media (max-width: 1023.98px) {
+  .db-table thead { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .db-table, .db-table tbody, .db-table tr, .db-table td { display: block; width: 100%; }
+  .db-table tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 12px; padding: 12px; margin-bottom: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+  .db-table tr.is-over { background: var(--status-pending-soft); border-color: var(--status-pending); border-left-width: 4px; }
+  .db-table tr.is-over td { background: transparent; box-shadow: none !important; }
+  .db-table td { padding: 0; border: 0; min-width: 0; overflow-wrap: anywhere; }
+  .db-table td[data-label]::before { content: attr(data-label); display: block; font-size: 12px; line-height: 16px; font-weight: 400; color: var(--text-muted); }
+  .db-table .db-num { text-align: left; }
+  .db-table td.db-c-name, .db-table td.db-c-amt { grid-column: 1 / -1; }
+  .db-c-amt .db-flag { margin: 4px 0 0 0; }
+}
+@media (min-width: 640px) { .db-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); } .db-tools .db-sub { flex: 1 1 auto; } }
+@media (min-width: 1024px) { .db-crow { grid-template-columns: 280px minmax(0, 1fr) 160px; grid-template-areas: "name bar amt"; } }
+@media (prefers-reduced-motion: reduce) { .db-root *, .db-root *::before, .db-root *::after { animation-duration: 1ms !important; } }

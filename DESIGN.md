@@ -1,6 +1,6 @@
 # DESIGN – Ứng dụng Đề nghị Chi cho Doanh nghiệp
 
-> Phiên bản: 1.5 · Ngày: 2026-11-02 · Liên kết yêu cầu: [PRD.md](PRD.md) · Thay đổi gần nhất: xem **mục 10** (v1.1–v1.2) và **mục 11** (trang Thống kê, v1.3), **mục 12** (màn Nhân viên, v1.4), **mục 13** (khung ứng dụng và Trang chủ điều hướng, v1.5)
+> Phiên bản: 1.6 · Ngày: 2026-11-02 · Liên kết yêu cầu: [PRD.md](PRD.md) · Thay đổi gần nhất: xem **mục 10** (v1.1–v1.2) và **mục 11** (trang Thống kê, v1.3), **mục 12** (màn Nhân viên, v1.4), **mục 13** (khung ứng dụng và Trang chủ điều hướng, v1.5), **mục 14** (tổng hợp chi từ cơ sở dữ liệu, v1.6)
 
 ---
 
@@ -617,3 +617,36 @@ Phần này **bổ sung** cho 4.1, 4.2, 10.2 và 10.7; mục 1–12 giữ nguyê
 | Màn hình con không tải được | Khối lỗi "Không tải được màn hình" + nút **Thử lại** (các màn khác vẫn dùng được) |
 | Chuyển màn | Focus chuyển tới tiêu đề của màn mới; tiêu đề tab trình duyệt đổi theo "Tên màn · Sổ Đề Nghị Chi" |
 - Có liên kết **Bỏ qua tới nội dung** (hiện khi focus). Thanh điều hướng là `<nav>` có nhãn; menu đổi vai trò là hộp thoại có bẫy focus, đóng bằng `Esc`/bấm ra ngoài.
+
+---
+
+## 14. Tổng hợp chi từ cơ sở dữ liệu (F-25, F-26)
+
+Phần này **bổ sung**; mục 1–13 giữ nguyên. Dùng đúng token và kiểu thẻ/bảng/huy hiệu ở mục 2–6, 11, 13. Chỉ **Quản lý** thấy.
+
+### 14.1 Bố cục
+- **Vị trí:** ngay dưới khối "Lối tắt" của Trang chủ Quản lý (13.4), cách 32px. Thứ tự từ trên xuống: (1) đầu khối: tiêu đề "Tổng hợp chi từ cơ sở dữ liệu" + chip kết nối + nút **Làm mới**; (2) **cảnh báo** (chỉ khi có); (3) hàng **4 thẻ số liệu**; (4) thẻ **Chi theo phân loại** (biểu đồ); (5) thẻ **Toàn bộ khoản chi** (bộ lọc + sắp xếp + bảng).
+- **Laptop (≥ 1024px):** thẻ số liệu 4 cột; mỗi hàng biểu đồ = tên (280px) · thanh · số tiền (160px) trên một dòng; bảng 7 cột thẳng hàng với tiêu đề.
+- **Điện thoại (< 1024px):** thẻ số liệu 2×2; mỗi hàng biểu đồ xếp 2 dòng (tên + tiền, rồi thanh); bảng chuyển thành **thẻ** (mỗi khoản một thẻ, nhãn 12px phía trên giá trị, tên nhân viên và số tiền chiếm cả hàng), không cuộn ngang.
+
+### 14.2 Thành phần
+- **Chip kết nối:** viên thuốc cao 28px: "Đã kết nối products.db · N khoản" (nền `--surface-2`), "Đang tải…", hoặc "Chưa kết nối" (nền `--status-pending-soft`). Luôn có biểu tượng cơ sở dữ liệu + chữ.
+- **Cảnh báo > 100 triệu:** khối `role="alert"` nền `--status-pending-soft`, viền 1px `--status-pending`, biểu tượng tam giác cảnh báo. Tiêu đề **"Cảnh báo: có N khoản chi trên 100 triệu đồng"** (đúng số khoản), bên dưới liệt kê mỗi khoản một dòng, **số tiền lớn trước**: "135.500.000 ₫ · Trần Thị Bình (NV002) · Vật tư · Đã duyệt · 02/11/2026 09:00". Chỉ hiện khi N ≥ 1; **ngưỡng là "lớn hơn" 100.000.000 ₫** (đúng 100 triệu hoặc 99.999.999 không cảnh báo); áp cho mọi trạng thái.
+- **Dòng vượt ngưỡng trong bảng:** nền `--status-pending-soft`, vạch trái 4px `--status-pending`, kèm nhãn chữ **"Trên 100 triệu"** có biểu tượng cảnh báo dưới số tiền (không chỉ dựa vào màu); thẻ số liệu "Trên 100 triệu" có viền trái 4px `--status-pending`.
+- **Thẻ số liệu:** Tổng số khoản · Tổng số tiền · Chờ duyệt (số khoản + tiền) · Trên 100 triệu (số khoản). Nhãn 13px/500, giá trị 22px/700, số `tabular-nums`.
+- **Biểu đồ chi theo phân loại:** thanh ngang SVG, mỗi phân loại một hàng, giảm dần theo tổng; mỗi thanh **xếp chồng theo trạng thái** (Chờ duyệt → Đã duyệt → Từ chối) bằng `--status-pending`, `--status-approved`, `--status-rejected`; độ dài theo hàng lớn nhất (=100%); chú giải 3 trạng thái ở phía trên; hàng nào có khoản > 100 triệu có nhãn "N khoản > 100 triệu". Mỗi đoạn có chú giải (`<title>`) và có bảng dữ liệu ẩn thị giác.
+- **Bảng "Toàn bộ khoản chi":** đủ 7 cột **ID · Mã NV · Tên nhân viên · Số tiền (căn phải) · Thời gian (dd/MM/yyyy HH:mm, giờ địa phương) · Phân loại chi · Trạng thái**; nhóm lọc **Tất cả · Chờ duyệt · Đã duyệt · Từ chối** (kèm số lượng, `aria-pressed`); ô **Sắp xếp**: Mới nhất (mặc định) · Số tiền cao → thấp · Nhân viên A–Z. Hiển thị **toàn bộ** các dòng, không phân trang.
+- **Huy hiệu trạng thái:** như 6.4 (viên thuốc 24px, nền `*-soft`, biểu tượng màu trạng thái), nhưng **chữ dùng `--text`** vì `--status-approved` trên `--status-approved-soft` chỉ đạt 4,35:1 (< 4,5:1).
+
+### 14.3 Trạng thái
+| Tình huống | Hiển thị |
+|---|---|
+| Đang tải | Chip "Đang tải…" + dòng "Đang tải dữ liệu từ cơ sở dữ liệu…" |
+| Chưa chạy máy chủ / mở bằng GitHub Pages / máy chủ trả lỗi | Chip "Chưa kết nối"; khối `role="alert"` nền `--status-pending-soft`: "Chưa kết nối cơ sở dữ liệu…" kèm hướng dẫn chạy `python3 server/server.py` và mở `http://127.0.0.1:8000/trang-chu/`; không hiện bảng/biểu đồ cũ; các chức năng khác không bị ảnh hưởng |
+| Cơ sở dữ liệu chưa có khoản nào | "Cơ sở dữ liệu chưa có khoản chi nào."; không có cảnh báo; thẻ số liệu bằng 0 |
+| Lọc ra rỗng | "Không có khoản chi nào ở trạng thái này." (cảnh báo và biểu đồ vẫn tính trên toàn bộ) |
+| Dữ liệu mới được ghi | Tự làm mới sau khi bộ đồng bộ ghi xong; nút **Làm mới** tải lại thủ công |
+
+### 14.4 Màu sắc, chữ, trợ năng
+- Chữ cảnh báo/nhãn dùng `--status-pending` trên `--status-pending-soft` (đạt ≥ 4,5:1); đoạn biểu đồ đạt ≥ 3:1 so với nền thẻ. Cảnh báo luôn có biểu tượng và chữ.
+- Bảng có `<caption>`, `th scope="col"`; nhóm lọc có nhãn; biểu tượng trang trí `aria-hidden`; vòng focus 2px `--primary`; nút ≥ 44px (nhóm lọc ≥ 40px).

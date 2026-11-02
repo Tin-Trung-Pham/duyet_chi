@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../duyet/css/review.css">
   <link rel="stylesheet" href="../thong-ke/css/stats.css">
   <link rel="stylesheet" href="../nhan-vien/css/emp.css">
+  <link rel="stylesheet" href="../database/css/db.css">
   <link rel="stylesheet" href="css/app.css">
   <style>html { color-scheme: light dark; } body { margin: 0; background: var(--bg); }</style>
 </head>
@@ -32,6 +33,9 @@
   <script src="../nhan-vien/js/emp-store.js"></script>
   <script src="../nhan-vien/js/emp-view.js"></script>
   <!-- Module 5: Khung ứng dụng -->
+  <!-- Cơ sở dữ liệu (products.db qua server/server.py) -->
+  <script src="../database/js/db-client.js"></script>
+  <script src="../database/js/db-panel.js"></script>
   <script src="js/app-model.js"></script>
   <script src="js/app-shell.js"></script>
   <script src="js/app-modules.js"></script>
@@ -42,7 +46,14 @@
       if (!storage) { // trình duyệt chặn hoàn toàn: dùng bộ nhớ tạm để app vẫn chạy (banner sẽ cảnh báo)
         var mem = {}; storage = { getItem: function (k) { return k in mem ? mem[k] : null; }, setItem: function () { throw new Error('SecurityError'); }, removeItem: function (k) { delete mem[k]; } };
       }
-      window.dncApp = DncApp.start(document.getElementById('app'), { storage: storage, modules: DncAppModules.real(storage) });
+      // API nằm cạnh thư mục ứng dụng: http://127.0.0.1:8000/api/ khi chạy server/server.py (trên GitHub Pages không có → panel báo "chưa kết nối").
+      var client = DncDb.createClient({ base: new URL('../api/', document.baseURI).href });
+      var sync = DncDb.createSync({ client: client, storage: storage });
+      sync.start();
+      window.dncApp = DncApp.start(document.getElementById('app'), {
+        storage: storage, modules: DncAppModules.real(storage),
+        homeExtras: function (el, ctx) { return DncDbPanel.mount(el, { client: client, sync: sync, session: ctx.session }); }
+      });
     })();
   </script>
 </body>

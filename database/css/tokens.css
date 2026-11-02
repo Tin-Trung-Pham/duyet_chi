@@ -1,0 +1,65 @@
+/* Token theo DESIGN.md mục 2–5. Dùng chung với các module khác (cùng tên biến). */
+:root {
+  --primary: #2F6FED;
+  --primary-contrast: #FFFFFF;
+  --primary-soft: #E6EEFD;
+  --status-pending: #8A5A00;
+  --status-pending-soft: #FFF1D6;
+  --status-approved: #12805C;
+  --status-approved-soft: #E3F5EE;
+  --status-rejected: #B3261E;
+  --status-rejected-soft: #FCE8E6;
+  --danger: #B3261E;
+
+  --bg: #F6F7F9;
+  --surface: #FFFFFF;
+  --surface-2: #EEF0F4;
+  --border: #DDE1E8;
+  --text: #14181F;
+  --text-muted: #5B6472;
+
+  --cat-1: #2F6FED;
+  --cat-2: #E8743B;
+  --cat-3: #7A4FD6;
+  --cat-4: #0E8A9B;
+  --cat-5: #C23B7A;
+  --cat-6: #6B8E23;
+  --cat-7: #6B7380;
+
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #6C9BFF;
+    --primary-contrast: #0B1220;
+    --primary-soft: #1B2A4A;
+    --status-pending: #F2B84E;
+    --status-pending-soft: #3A2C10;
+    --status-approved: #3DD598;
+    --status-approved-soft: #12372C;
+    --status-rejected: #F2766D;
+    --status-rejected-soft: #3F1B18;
+    --danger: #F2766D;
+
+    --bg: #0F1115;
+    --surface: #181B21;
+    --surface-2: #222630;
+    --border: #2E3340;
+    --text: #ECEFF4;
+    --text-muted: #A0A8B6;
+
+    --cat-1: #6C9BFF;
+    --cat-2: #FF9A66;
+    --cat-3: #B091F5;
+    --cat-4: #4FD0E0;
+    --cat-5: #F27FB0;
+    --cat-6: #A9D15A;
+    --cat-7: #9AA3B2;
+  }
+}
+
+/* Bổ sung của module Duyệt: chữ trên nút Duyệt (DESIGN 6.1: "chữ trắng/đen theo token tương phản"). */
+:root { --approve-contrast: #FFFFFF; }
+@media (prefers-color-scheme: dark) { :root { --approve-contrast: #0B1220; } }

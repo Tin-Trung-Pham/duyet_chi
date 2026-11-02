@@ -73,7 +73,7 @@
     var nav = o.nav || memNav(o.path || '/');
     var log = { mounts: [], destroys: [] };
     var modules = o.modules === 'real' ? DncAppModules.real(storage) : (o.modules || stubModules(log));
-    var app = DncApp.start(box, { storage: storage, nav: nav, modules: modules, today: o.today || TODAY });
+    var app = DncApp.start(box, { storage: storage, nav: nav, modules: modules, today: o.today || TODAY, homeExtras: o.homeExtras });
     var h = { box: box, app: app, storage: storage, nav: nav, log: log };
     h.q = function (s) { return box.querySelector(s); };
     h.qa = function (s) { return Array.prototype.slice.call(box.querySelectorAll(s)); };

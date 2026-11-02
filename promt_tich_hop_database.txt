@@ -1,0 +1,5 @@
+Tôi muốn tích hợp database vào dự án quản lý duyet chi doanh nghiep
+Tạo database SQLite tên products.db với 1 bảng "products" gồm: id, ma so nhan vien,ten nhan vien,số tiền,  thời gian, phân loại chi, duyet hay tu choi hay cho duyet
+Thêm dữ liệu mẫu: ít nhất 5 sản phẩm để test.
+Khi nhập dữ liệu hãy ghi các thông tin tương ứng vào database
+Trong trang quản lý tổng hãy thể hiện toàn bộ thông tin thu chi trong database và thực hiện vẽ biểu đồ hoặc cảnh báo

@@ -1,6 +1,6 @@
 # PRD – Ứng dụng Đề nghị Chi cho Doanh nghiệp
 
-> Phiên bản: 1.1 · Ngày: 2026-11-02 · Liên kết thiết kế: [DESIGN.md](DESIGN.md) · Thay đổi v1.1: **trang Thống kê** (F-16…F-20, US-19…US-25); v1.2: **màn Nhân viên** (F-02 chi tiết hơn, F-21, F-22, US-26…US-30); v1.3: **khung ứng dụng và Trang chủ điều hướng** (F-01 chi tiết hơn, F-23, F-24, US-31…US-35), xem mục 10
+> Phiên bản: 1.1 · Ngày: 2026-11-02 · Liên kết thiết kế: [DESIGN.md](DESIGN.md) · Thay đổi v1.1: **trang Thống kê** (F-16…F-20, US-19…US-25); v1.2: **màn Nhân viên** (F-02 chi tiết hơn, F-21, F-22, US-26…US-30); v1.3: **khung ứng dụng và Trang chủ điều hướng** (F-01 chi tiết hơn, F-23, F-24, US-31…US-35); v1.4: **cơ sở dữ liệu SQLite `products.db`** (F-25, F-26, US-36…US-40), xem mục 10
 
 ---
 
@@ -91,6 +91,11 @@ Cả hai đều không chuyên kế toán; cần giao diện đơn giản, ít b
 | US-33 | người dùng | mở một địa chỉ (#/duyet, #/thong-ke…) hoặc bấm Quay lại của trình duyệt và vào đúng màn hình | dùng được liên kết, nút Quay lại, đánh dấu trang | Must |
 | US-34 | quản lý | thấy ngay ở Trang chủ số khoản đang chờ duyệt và lối tắt tới Duyệt, Thống kê, Nhân viên | xử lý việc cần làm nhanh | Must |
 | US-35 | người dùng | được báo khi dữ liệu không lưu được, bị hỏng, hoặc chỉ nằm trên trình duyệt này, và có cách đặt lại | hiểu giới hạn của app và không bị kẹt | Should |
+| US-36 | quản lý | mọi đề nghị được nhập đều được ghi vào cơ sở dữ liệu SQLite `products.db` (mã và tên nhân viên, số tiền, thời gian, phân loại chi, trạng thái) | có một sổ chi bền vững, đọc được bằng công cụ SQL | Must |
+| US-37 | quản lý | trạng thái trong cơ sở dữ liệu tự đổi khi tôi duyệt hoặc từ chối | sổ chi luôn khớp với thực tế | Must |
+| US-38 | quản lý | xem toàn bộ các khoản chi trong cơ sở dữ liệu ngay ở Trang chủ (bảng, lọc theo trạng thái, sắp xếp) | không phải mở từng màn | Must |
+| US-39 | quản lý | thấy biểu đồ chi theo phân loại và trạng thái | biết tiền chi nhiều nhất vào đâu | Must |
+| US-40 | quản lý | được **cảnh báo** khi có một khoản chi **trên 100 triệu đồng** | kiểm tra kỹ các khoản lớn | Must |
 
 ---
 
@@ -119,6 +124,8 @@ Cả hai đều không chuyên kế toán; cần giao diện đơn giản, ít b
 | F-18 | Chỉ số thống kê khác | Chi trung bình mỗi đề nghị Đã duyệt, đề nghị lớn nhất, tỷ lệ duyệt (Đã duyệt ÷ đã xử lý), thời gian xử lý trung bình | **Should** |
 | F-19 | Nội dung/nhà cung cấp chi nhiều nhất | Top 5 nội dung hoặc nhà cung cấp theo tổng chi Đã duyệt trong tháng | **Should** |
 | F-20 | Điểm chính | Vài câu nhận xét tự động ở đầu trang (danh mục chi nhiều nhất, tăng/giảm so với tháng trước, nhân viên chi nhiều nhất, số khoản chờ duyệt) | **Should** |
+| F-25 | Cơ sở dữ liệu SQLite và ghi song song | File `products.db`, bảng `products` (id, mã nhân viên, tên nhân viên, số tiền, thời gian, phân loại chi, trạng thái Chờ duyệt/Đã duyệt/Từ chối; thêm cột `ma_de_nghi` để cập nhật đúng dòng) kèm ≥ 5 dòng dữ liệu mẫu. Máy chủ Python cục bộ (`server/server.py`) cung cấp API đọc/ghi. Mỗi khi nhập đề nghị, sửa, duyệt, từ chối, hoàn tác hoặc đổi thông tin nhân viên, ứng dụng ghi/cập nhật dòng tương ứng; localStorage vẫn là nguồn chính của ứng dụng và tự đối soát bù khi mất kết nối | **Must** |
+| F-26 | Tổng hợp chi từ cơ sở dữ liệu và cảnh báo | Trên Trang chủ của Quản lý: bảng toàn bộ khoản chi trong `products.db`, biểu đồ chi theo phân loại (xếp chồng theo trạng thái), thẻ số liệu, và **cảnh báo khi một khoản chi lớn hơn 100.000.000 ₫** (liệt kê từng khoản, đánh dấu dòng vi phạm). Không kết nối được máy chủ thì báo "Chưa kết nối" kèm hướng dẫn, các chức năng khác vẫn dùng bình thường | **Must** |
 | F-23 | Khung ứng dụng và điều hướng | Thanh đầu trang (tên app, vai trò hiện tại, đổi vai trò) và thanh điều hướng theo vai trò (Nhân viên: Trang chủ · Thống kê · Thêm; Quản lý: Trang chủ · Thống kê · Duyệt (kèm số khoản chờ) · Nhân viên). Mỗi màn có một địa chỉ riêng (`#/…`), hỗ trợ nút Quay lại; vào màn không thuộc vai trò thì về Trang chủ kèm thông báo; chưa chọn vai trò thì về màn Chọn vai trò | **Must** |
 | F-24 | Trang chủ điều hướng và thông báo hệ thống | Trang chủ: lời chào, thẻ tổng quan tháng (Chờ duyệt, Đã duyệt, Từ chối) và lối tắt tới các màn theo vai trò. Banner: "dữ liệu chỉ lưu trên trình duyệt này" (đóng được), "dữ liệu sẽ mất khi đóng tab" (khi bị chặn lưu trữ), "không đọc được dữ liệu" kèm **Đặt lại dữ liệu** (gõ XÓA để xác nhận) | **Must** |
 | F-21 | Tổng hợp danh bạ nhân viên | Dải tóm tắt (tổng / đang hoạt động / đã ngưng) và với mỗi nhân viên: số đề nghị, số khoản chờ duyệt, tổng Đã duyệt | **Must** |
@@ -131,6 +138,7 @@ Cả hai đều không chuyên kế toán; cần giao diện đơn giản, ít b
 - Tổng chi và biểu đồ chỉ cộng khoản Đã duyệt; danh sách hiển thị đủ cả ba trạng thái.
 - **Quy tắc thống kê** *(giả định)*: tháng của một khoản tính theo **ngày đề nghị** (`ngay`), không phải ngày duyệt. "Lý do chi" được hiểu là **danh mục chi**. Tỷ lệ duyệt = Đã duyệt ÷ (Đã duyệt + Từ chối) của tháng; thời gian xử lý = từ lúc gửi đến lúc duyệt/từ chối. Chênh lệch so với tháng trước khi tháng trước bằng 0 hiển thị là "Mới" (không tính %). Danh mục dưới 3% gộp vào "Khác" trên biểu đồ tròn; các phần trăm được làm tròn sao cho tổng đúng 100%.
 - **Quy tắc nhân viên** *(giả định)*: mã được chuẩn hóa (cắt khoảng trắng, viết hoa) và chỉ gồm chữ cái không dấu, số, dấu `.` `_` `-`; họ tên được gộp khoảng trắng thừa; cho phép trùng họ tên (mã mới là khóa duy nhất). Ngưng hoạt động không xóa dữ liệu: nhân viên không còn xuất hiện trong ô chọn người đề nghị mới nhưng các đề nghị cũ vẫn hiển thị tên. Có thể bật lại hoạt động bất kỳ lúc nào.
+- **Quy tắc cơ sở dữ liệu** *(giả định)*: ngưỡng cảnh báo là **lớn hơn** 100.000.000 ₫ (đúng 100 triệu không cảnh báo), áp cho mọi trạng thái. Cột thời gian là lúc đề nghị được tạo (UTC, ISO 8601). Phân loại chi lưu bằng tên tiếng Việt. Sổ chi **chỉ ghi thêm/cập nhật trạng thái, không có API xóa**. Mã nhân viên và tên lấy theo danh bạ tại thời điểm ghi và được cập nhật khi danh bạ đổi.
 - **Phạm vi theo vai trò:** Quản lý thấy toàn bộ và có thể lọc theo từng nhân viên; Nhân viên chỉ thấy số liệu của chính mình (không có biểu đồ/bảng theo nhân viên).
 - Màu của chênh lệch (tăng/giảm) **không** dùng màu trạng thái duyệt; chỉ dùng mũi tên và chữ, vì chi tăng không mặc định là xấu.
 
@@ -138,7 +146,7 @@ Cả hai đều không chuyên kế toán; cần giao diện đơn giản, ít b
 
 ## 5. Non-Goals – Không làm ở phiên bản này
 
-- Đăng nhập thật, mật khẩu, phân quyền theo tài khoản; backend và đồng bộ giữa các máy/người dùng.
+- Đăng nhập thật, mật khẩu, phân quyền theo tài khoản; đồng bộ giữa nhiều máy/nhiều người dùng (máy chủ Python cục bộ chỉ phục vụ **một máy**, lắng nghe 127.0.0.1; không triển khai lên internet, không chạy trên GitHub Pages).
 - Đính kèm hóa đơn, báo giá, chứng từ.
 - Phòng ban, mã dự án, trung tâm chi phí; ảnh đại diện, email, số điện thoại của nhân viên; nhập danh sách nhân viên từ file.
 - Duyệt nhiều cấp, ủy quyền duyệt, hạn mức/ngân sách.
@@ -203,6 +211,7 @@ Chi tiết tại [DESIGN.md](DESIGN.md).
 ## 8. Ràng buộc kỹ thuật
 
 - **Loại ứng dụng:** web tĩnh HTML/CSS/JavaScript thuần, không framework, không thư viện ngoài; biểu đồ vẽ bằng SVG.
+- **Cơ sở dữ liệu (tùy chọn):** SQLite `products.db` + máy chủ Python 3 chỉ dùng thư viện chuẩn (`server/server.py`, API JSON, lắng nghe 127.0.0.1). Mọi truy vấn dùng tham số (chống SQL injection); chặn path traversal, không phục vụ file `.db`/`.py`; giới hạn thân yêu cầu 2 MB. Không chạy máy chủ thì ứng dụng vẫn dùng bình thường bằng localStorage.
 - **Lưu trữ:** `localStorage`, khóa có số phiên bản (vd. `dnc:v1:*`) để dễ nâng cấp. Dữ liệu chỉ nằm trên trình duyệt đang dùng, **không chia sẻ giữa các máy**; cần ghi rõ cho người dùng.
 - **Mô hình dữ liệu:**
   - Nhân viên: `id` (cố định, do hệ thống cấp), `ma`, `hoTen`, `hoatDong`, `ngayTao`, `ngayCapNhat`. Đổi `ma` hoặc `hoTen` **không** làm mất liên kết với các đề nghị cũ vì đề nghị tham chiếu theo `id`.
@@ -232,6 +241,8 @@ Chi tiết tại [DESIGN.md](DESIGN.md).
 | Lỗi nhập sai lọt qua | 0 khoản có số lượng ≤ 0, đơn giá < 0, ngày sai | Test validate |
 | Khóa đúng khoản đã xử lý | 0 trường hợp sửa/xóa được khoản Đã duyệt/Từ chối | Test quy tắc trạng thái |
 | Dùng trên điện thoại | Không cuộn ngang, nút bấm ≥ 44px, dùng được ở 360px | Kiểm thử thủ công |
+| Ghi đầy đủ vào CSDL | 100% đề nghị nhập/duyệt/từ chối xuất hiện đúng trong `products.db` (mã, tên, số tiền, phân loại, trạng thái) | Test tích hợp với máy chủ thật |
+| Cảnh báo khoản lớn | 100% khoản > 100 triệu bị cảnh báo; 0 khoản ≤ 100 triệu bị cảnh báo nhầm | Test ngưỡng (99.999.999 / 100.000.000 / 100.000.001) |
 | Mức hài lòng | ≥ 4/5 từ 5 người thử (nhân viên + quản lý) | Hỏi nhanh sau buổi thử |
 
 ---
@@ -244,3 +255,4 @@ Chi tiết tại [DESIGN.md](DESIGN.md).
 | 1.1 | 2026-11-02 | Thêm trang **Thống kê** (module 3): mở rộng F-10, F-14 (lên Must); thêm F-16…F-20 và US-19…US-25; sửa Non-Goals (cho phép so sánh 6/12 tháng); thêm luồng F, quy tắc thống kê, 3 chỉ số thành công |
 | 1.2 | 2026-11-02 | Thêm màn **Nhân viên** (module 4): mở rộng F-02 (quy tắc mã/tên, xóa chỉ khi chưa có đề nghị); thêm F-21, F-22 và US-26…US-30; bổ sung Non-Goals (email/SĐT, nhập từ file), quy tắc nhân viên và mô hình dữ liệu (`ngayTao`, `ngayCapNhat`) |
 | 1.3 | 2026-11-02 | Thêm **khung ứng dụng và Trang chủ điều hướng** (module 5): mở rộng F-01; thêm F-23, F-24 và US-31…US-35. Trang chủ phiên bản này là bảng điều khiển điều hướng; **danh sách đề nghị theo ngày** (F-05, F-06, F-09) sẽ là module riêng |
+| 1.4 | 2026-11-02 | Thêm **cơ sở dữ liệu SQLite `products.db`** và máy chủ Python cục bộ: F-25 (ghi song song), F-26 (tổng hợp chi + biểu đồ + cảnh báo > 100 triệu), US-36…US-40, quy tắc cơ sở dữ liệu, ràng buộc kỹ thuật, 2 chỉ số thành công; sửa Non-Goals/§8 (máy chủ cục bộ chỉ cho một máy) |

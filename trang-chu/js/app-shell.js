@@ -1,5 +1,6 @@
 /* Sổ Đề Nghị Chi – Module 5: khung ứng dụng (DESIGN mục 13, kèm 4.1, 10.2, 10.7).
- * API: DncApp.start(rootEl, { storage, modules, nav?, today? }) → controller
+ * API: DncApp.start(rootEl, { storage, modules, nav?, today?, homeExtras? }) → controller
+ *   homeExtras(el, ctx) → {destroy()} : (tuỳ chọn) gắn thêm nội dung dưới Trang chủ của Quản lý, vd. bảng tổng hợp từ CSDL.
  *   modules: { 'nhap-lieu': { mount(el, ctx) → {destroy()} }, 'duyet': …, 'thong-ke': …, 'nhan-vien': … }
  *   ctx = { session, params, storage, navigate(path), forbidden(), notifyChanged() }
  */
@@ -169,7 +170,7 @@
         return '<a class="app-short' + (hot ? ' is-hot' : '') + '" href="#' + A.buildPath(nm) + '" data-nav="' + nm + '" data-short="' + nm + '">' + icon(ic, 28) + '<span class="app-short-txt"><strong>' + title + '</strong><small>' + desc + '</small></span>' + (extra || '') + icon('chev', 20) + '</a>';
       }
       var pendBadge = S.pendingAll > 0 ? '<span class="app-badge app-badge-inline" data-role="home-badge">' + S.pendingAll + '</span>' : '';
-      mainEl.innerHTML = '<section class="app-home" aria-labelledby="' + uid + '-ht"><h1 id="' + uid + '-ht" class="app-title" data-role="greeting">Xin chào, ' + esc(name) + '</h1>' +
+      var core = '<h1 id="' + uid + '-ht" class="app-title" data-role="greeting">Xin chào, ' + esc(name) + '</h1>' +
         '<p class="app-lead">' + (mgr ? 'Bạn đang dùng với vai trò Quản lý. Đây là việc cần làm trong ' : 'Bạn đang dùng với vai trò Nhân viên. Đây là các đề nghị của bạn trong ') + esc(A.monthLabel(month).toLowerCase()) + '.</p>' +
         '<div class="app-kpis" data-role="kpis">' +
         kpi('pending', mgr ? 'Chờ duyệt (tháng này)' : 'Chờ duyệt của bạn', A.formatVND(S.pending.total), S.pending.count + ' khoản' + (mgr && S.pendingAll > S.pending.count ? ' · còn ' + (S.pendingAll - S.pending.count) + ' khoản ở tháng khác' : ''), mgr) +
@@ -179,7 +180,19 @@
         (mgr ? shortcut('duyet', 'check', 'Duyệt đề nghị', 'Duyệt hoặc từ chối các khoản đang chờ', pendBadge, S.pendingAll > 0) +
           shortcut('thong-ke', 'chart', 'Thống kê', 'So sánh chi theo tháng, danh mục, nhân viên') + shortcut('nhan-vien', 'users', 'Nhân viên', 'Thêm, sửa và xem tổng hợp nhân viên')
           : shortcut('nhap-lieu', 'plus', 'Thêm đề nghị chi', 'Gửi đề nghị mới cho quản lý duyệt', '', true) + shortcut('thong-ke', 'chart', 'Thống kê của tôi', 'Xem các đề nghị và chi tiêu của bạn')) +
-        '</div></section>';
+        '</div>';
+      // Phần lõi được vẽ lại khi dữ liệu đổi; vùng "extras" (bảng tổng hợp CSDL…) chỉ gắn một lần cho mỗi lần mở Trang chủ.
+      if (!mainEl.querySelector('[data-role="home-core"]')) {
+        mainEl.innerHTML = '<section class="app-home" aria-labelledby="' + uid + '-ht"><div data-role="home-core"></div><div data-role="home-extras"></div></section>';
+      }
+      mainEl.querySelector('[data-role="home-core"]').innerHTML = core;
+      mountExtras(mgr);
+    }
+    function mountExtras(mgr) {
+      if (!mgr || typeof opts.homeExtras !== 'function' || st.extras) return;
+      var host = mainEl.querySelector('[data-role="home-extras"]');
+      if (!host) return;
+      try { st.extras = opts.homeExtras(host, ctxFor({ name: 'home', params: [] })) || null; } catch (e) { st.extras = null; host.innerHTML = ''; }
     }
 
     /* ---------- Menu đổi vai trò (10.2) ---------- */
@@ -224,6 +237,8 @@
 
     /* ---------- Định tuyến ---------- */
     function destroyModule() {
+      if (st.extras && st.extras.destroy) { try { st.extras.destroy(); } catch (e) { /* bỏ qua */ } }
+      st.extras = null;
       if (st.mod && st.mod.destroy) { try { st.mod.destroy(); } catch (e) { /* bỏ qua */ } }
       st.mod = null;
     }
