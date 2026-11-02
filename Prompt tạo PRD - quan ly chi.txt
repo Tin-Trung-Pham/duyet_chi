@@ -1,0 +1,29 @@
+Tôi muốn xây dựng ứng dụng ghi lai chi hang ngay của từng cá nhân, xem tong quan theo thang.
+Đối tượng sử dụng chính là các nhân viên mua hàng có thể đề xuất chi cho doanh nghiệp, ngoài ra còn có quản lý để kiểm tra thi cho từng nhân viên.
+Ứng dụng cần các chức năng chính sau:thêm nhân viên đề nghị chi, them khoang chi, xem danh sach, xem bieu do tong, sua va xoa
+Giao diện: các màn hình cần có như sau: Trang chu gom bieu do va trang nhap lieu
+Hãy đặt câu hỏi để làm rõ những phần tôi mô tả chưa rõ (mục tiêu, người dùng, phạm vi chức năng).
+Sau khi đã đủ thông tin, hãy viết PRD và DESIGN hoàn chỉnh theo cấu trúc file PRD.MD và DESIGN.MD chuẩn, gồm:
+
+(1) Tổng quan ứng dụng
+(2) Mục tiêu ứng dụng
+(3) Đối tượng người dùng và User Stories
+(4) Danh sách chức năng chính, kèm độ ưu tiên Must/Should/Could
+(5) Non-Goals - những gì KHÔNG làm ở phiên bản này
+(6) Luồng sử dụng chính - các bước người dùng thao tác theo thứ tự
+(7) Giao diện dự kiến (liên kết với DESIGN.MD)
+(8) Ràng buộc kỹ thuật
+(9) Tiêu chí thành công (Success Metrics)
+
+và file DESIGN.MD chuẩn, gồm:
+1. Tổng quan 
+2. Màu sắc 
+3. Chữ viết
+4. Khoảng cách & Bố cục 
+5. Hình khối & Chiều sâu 
+6. Thành phần giao diện 
+7. Biểu tượng & Hình ảnh 
+8. Chuyển động 
+9. Trang thái giao diện 
+
+

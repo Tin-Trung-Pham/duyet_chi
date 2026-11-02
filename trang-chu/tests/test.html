@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Đang chạy test…</title>
+  <link rel="stylesheet" href="../css/tokens.css">
+  <link rel="stylesheet" href="../../nhap-lieu/css/entry.css">
+  <link rel="stylesheet" href="../../duyet/css/review.css">
+  <link rel="stylesheet" href="../../thong-ke/css/stats.css">
+  <link rel="stylesheet" href="../../nhan-vien/css/emp.css">
+  <link rel="stylesheet" href="../css/app.css">
+  <style>
+    body { margin: 0; background: var(--bg); font-family: system-ui, sans-serif; }
+    #summary { margin: 0; padding: 8px 12px; font: 12px/16px ui-monospace, monospace; white-space: pre-wrap; background: #f4f4f4; color: #111; border-bottom: 1px solid #ddd; }
+  </style>
+</head>
+<body>
+  <pre id="summary">Đang chạy…</pre>
+  <script src="../../nhap-lieu/js/entry-model.js"></script><script src="../../nhap-lieu/js/entry-store.js"></script><script src="../../nhap-lieu/js/entry-view.js"></script>
+  <script src="../../duyet/js/review-model.js"></script><script src="../../duyet/js/review-store.js"></script><script src="../../duyet/js/review-view.js"></script>
+  <script src="../../thong-ke/js/stats-model.js"></script><script src="../../thong-ke/js/stats-store.js"></script><script src="../../thong-ke/js/stats-view.js"></script>
+  <script src="../../nhan-vien/js/emp-model.js"></script><script src="../../nhan-vien/js/emp-store.js"></script><script src="../../nhan-vien/js/emp-view.js"></script>
+  <script src="../js/app-model.js"></script>
+  <script src="../js/app-shell.js"></script>
+  <script src="../js/app-modules.js"></script>
+  <script src="runner.js"></script>
+  <script src="helpers.js"></script>
+  <script src="model.test.js"></script>
+  <script src="shell.test.js"></script>
+  <script src="style.test.js"></script>
+  <script src="integration.test.js"></script>
+  <script>window.addEventListener('load', function () { runAll(); });</script>
+</body>
+</html>

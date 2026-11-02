@@ -1,0 +1,4 @@
+Mục tiêu: Ghi lại thu/chi hàng ngày, xem tổng quan theo tháng
+Người dùng: Cá nhân, dùng trên điện thoại/laptop
+Chức năng: Thêm khoản thu/chi, xem danh sách, xem biểu đồ tổng, sửa/xóa
+Giao diện: 2 màn hình – Trang chủ (biểu đồ) và Trang nhập liệu

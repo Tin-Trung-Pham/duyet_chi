@@ -1,0 +1,9 @@
+Đây là PRD hiện tại của ứng dụng quan ly chi doanh nghiep: PRD.md.
+Đây là DESIGN.MD hiện tại của tôi: DESIGN.md.
+Hãy so sánh 2 tài liệu và liệt kê những chức năng/màn hình trong PRD mà DESIGN.MD CHƯA mô tả giao diện.
+Với mỗi phần còn thiếu, hãy bổ sung vào DESIGN.MD gồm:
+(1) Bố cục tổng thể của màn hình
+(2) Danh sách thành phần giao diện cần có - nút, form, bảng, biểu đồ...
+(3) Màu sắc và font chữ theo đúng phong cách đã có trong DESIGN.MD
+(4) Cách hiển thị trên điện thoại (responsive)
+Giữ nguyên toàn bộ phần DESIGN.MD đã có, chỉ bổ sung thêm phần mới, không xóa hay viết lại từ đầu.

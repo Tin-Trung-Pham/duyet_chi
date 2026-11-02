@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thống kê</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/stats.css">
+  <style>
+    /* Khung thử nghiệm – KHÔNG thuộc module. Thanh đầu trang/điều hướng thật thuộc module khác. */
+    html { color-scheme: light dark; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 15px; line-height: 22px; }
+    .sh-top { height: 56px; display: flex; align-items: center; padding: 0 16px; background: var(--surface); border-bottom: 1px solid var(--border); font-weight: 700; }
+    .sh-dev { max-width: 1120px; margin: 16px auto 0; padding: 12px 16px; font-size: 13px; line-height: 18px; color: var(--text-muted); background: var(--surface); border: 1px dashed var(--border); border-radius: 14px; }
+    .sh-dev strong { color: var(--text); }
+    .sh-dev .sh-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+    .sh-dev select, .sh-dev button { font: inherit; font-size: 13px; min-height: 36px; padding: 0 10px; color: var(--text); background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; }
+    .sh-wrap { margin: 0 12px; }
+  </style>
+</head>
+<body>
+  <div class="sh-top">Sổ Đề Nghị Chi</div>
+
+  <div class="sh-wrap"><div class="sh-dev">
+    <strong>Khung thử nghiệm</strong> (không thuộc module Thống kê). Danh bạ nhân viên, vai trò và đề nghị thật thuộc các module khác.
+    <div class="sh-row">
+      <label for="sh-role">Giả lập vai trò:</label>
+      <select id="sh-role"></select>
+      <button type="button" id="sh-seed">Nạp dữ liệu mẫu (8 tháng)</button>
+      <button type="button" id="sh-clear">Xóa dữ liệu thử</button>
+    </div>
+  </div></div>
+
+  <div id="app"></div>
+
+  <script src="js/stats-model.js"></script>
+  <script src="js/stats-store.js"></script>
+  <script src="js/stats-view.js"></script>
+  <script>
+    (function () {
+      var store = DncStatsStore.create({ storage: window.localStorage });
+      var app = document.getElementById('app');
+      var roleSel = document.getElementById('sh-role');
+      var ctrl = null;
+      function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+      function fillRoles() {
+        var cur = roleSel.value;
+        var h = '<option value="quan_ly">Quản lý</option>';
+        var l = store.listNhanVien();
+        if (l.ok) l.data.forEach(function (e) { h += '<option value="nv:' + esc(e.id) + '">Nhân viên: ' + esc(e.hoTen) + '</option>'; });
+        roleSel.innerHTML = h;
+        roleSel.value = cur;
+        if (roleSel.value !== cur) roleSel.value = 'quan_ly';
+      }
+      function session() {
+        var v = roleSel.value;
+        return v.indexOf('nv:') === 0 ? { vaiTro: 'nhan_vien', nhanVienId: v.slice(3) } : { vaiTro: 'quan_ly' };
+      }
+      function mountPage() {
+        if (ctrl) ctrl.destroy();
+        ctrl = DncStats.mount(app, { store: store, session: session() });
+      }
+
+      /* Dữ liệu mẫu có quy luật: 8 tháng, 3 nhân viên, đủ 7 danh mục, đủ 3 trạng thái. */
+      document.getElementById('sh-seed').addEventListener('click', function () {
+        if (localStorage.getItem(DncStatsStore.KEY_DN) && !confirm('Đã có dữ liệu đề nghị. Ghi đè bằng dữ liệu mẫu?')) return;
+        localStorage.setItem(DncStatsStore.KEY_NV, JSON.stringify([
+          { id: 'nv1', ma: 'NV001', hoTen: 'Nguyễn Văn An', hoatDong: true },
+          { id: 'nv2', ma: 'NV002', hoTen: 'Trần Thị Bình', hoatDong: true },
+          { id: 'nv3', ma: 'NV003', hoTen: 'Lê Hoàng Cường', hoatDong: true },
+          { id: 'nv4', ma: 'NV004', hoTen: 'Phạm Thu Dung', hoatDong: false }
+        ]));
+        var cats = ['van_phong_pham', 'vat_tu', 'thiet_bi', 'van_chuyen', 'tiep_khach', 'dich_vu', 'khac'];
+        var names = ['Giấy A4 Hồng Hà', 'Máy in Canon', 'Cước vận chuyển', 'Tiếp khách đối tác', 'Bảo trì điều hòa', 'Vật tư đóng gói', 'Bút bi Thiên Long', 'Màn hình Dell 24"'];
+        var out = [], n = 0, now = new Date();
+        for (var back = 7; back >= 0; back--) {
+          var perMonth = 5 + (back % 3) * 2;
+          for (var i = 0; i < perMonth; i++) {
+            n++;
+            var d = new Date(now.getFullYear(), now.getMonth() - back, 1 + ((i * 5 + back * 3) % 27));
+            if (back === 0 && d > now) d = new Date(now.getFullYear(), now.getMonth(), Math.max(1, now.getDate()));
+            var status = i % 7 === 0 ? 'tu_choi' : (back === 0 && i % 3 === 0) ? 'cho_duyet' : (back === 0 && i % 4 === 1) ? 'cho_duyet' : 'da_duyet';
+            var created = new Date(d.getTime() - 3600000 * 2);
+            var done = status === 'cho_duyet' ? null : new Date(d.getTime() + 3600000 * (6 + (i * 7) % 60));
+            out.push({
+              id: 'dn_seed' + n, nhanVienId: 'nv' + (1 + (i + back) % 4), nhaCungCap: names[(i + back) % names.length],
+              danhMuc: cats[(i * 3 + back) % cats.length], soLuong: 1 + (i % 4) * 1.5, donGia: 150000 + ((i * 7 + back * 3) % 9) * 380000,
+              ngay: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'),
+              ghiChu: '', trangThai: status, lyDoTuChoi: status === 'tu_choi' ? 'Giá chưa hợp lý' : null,
+              ngayTao: created.toISOString(), ngayXuLy: done && done <= now ? done.toISOString() : (status === 'cho_duyet' ? null : created.toISOString())
+            });
+          }
+        }
+        localStorage.setItem(DncStatsStore.KEY_DN, JSON.stringify(out));
+        fillRoles();
+        ctrl.refresh();
+      });
+      document.getElementById('sh-clear').addEventListener('click', function () {
+        if (!confirm('Xóa toàn bộ dữ liệu thử (nhân viên và đề nghị)?')) return;
+        localStorage.removeItem(DncStatsStore.KEY_NV);
+        localStorage.removeItem(DncStatsStore.KEY_DN);
+        fillRoles(); ctrl.refresh();
+      });
+      roleSel.addEventListener('change', mountPage);
+      fillRoles(); mountPage();
+    })();
+  </script>
+</body>
+</html>

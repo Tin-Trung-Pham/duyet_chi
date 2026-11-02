@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nhập liệu chi</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/entry.css">
+  <style>
+    /* Khung thử nghiệm – KHÔNG thuộc module. Thanh đầu trang/điều hướng thật thuộc module khác. */
+    html { color-scheme: light dark; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 15px; line-height: 22px; }
+    .sh-top { height: 56px; display: flex; align-items: center; padding: 0 16px; background: var(--surface); border-bottom: 1px solid var(--border); font-weight: 700; }
+    .sh-dev { max-width: 560px; margin: 16px auto 0; padding: 12px 16px; font-size: 13px; line-height: 18px; color: var(--text-muted); background: var(--surface); border: 1px dashed var(--border); border-radius: 14px; }
+    .sh-dev strong { color: var(--text); }
+    .sh-dev .sh-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+    .sh-dev select, .sh-dev button { font: inherit; font-size: 13px; min-height: 36px; padding: 0 10px; color: var(--text); background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; }
+    .sh-list { max-width: 560px; margin: 16px auto 32px; padding: 0 16px; }
+    .sh-list h2 { font-size: 17px; line-height: 24px; margin: 0 0 8px; }
+    .sh-item { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 10px 12px; margin-bottom: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+    .sh-item b { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .sh-item small { display: block; color: var(--text-muted); }
+    .sh-item button { font: inherit; font-size: 13px; min-height: 36px; padding: 0 12px; color: var(--text); background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="sh-top">Sổ Đề Nghị Chi</div>
+
+  <div class="sh-dev">
+    <strong>Khung thử nghiệm</strong> (không thuộc module Nhập liệu chi). Vai trò, danh bạ nhân viên và danh sách thật thuộc các module khác.
+    <div class="sh-row">
+      <label for="sh-role">Giả lập vai trò:</label>
+      <select id="sh-role"></select>
+      <button type="button" id="sh-seed">Nạp 3 nhân viên mẫu</button>
+      <button type="button" id="sh-clear">Xóa dữ liệu thử</button>
+    </div>
+  </div>
+
+  <div id="app"></div>
+
+  <section class="sh-list" aria-label="Đề nghị đã lưu (thô)">
+    <h2>Đề nghị đã lưu (thô, để kiểm tra dữ liệu)</h2>
+    <div id="sh-items"></div>
+  </section>
+
+  <script src="js/entry-model.js"></script>
+  <script src="js/entry-store.js"></script>
+  <script src="js/entry-view.js"></script>
+  <script>
+    (function () {
+      var store = DncStore.create({ storage: window.localStorage });
+      var app = document.getElementById('app');
+      var roleSel = document.getElementById('sh-role');
+      var ctrl = null;
+      var editId = null;
+
+      function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+      function fillRoles() {
+        var cur = roleSel.value;
+        var opts = '<option value="">Không giả lập (tự chọn người đề nghị)</option><option value="quan_ly">Quản lý</option>';
+        var l = store.listNhanVien();
+        if (l.ok) l.data.forEach(function (e) { opts += '<option value="nv:' + esc(e.id) + '">Nhân viên: ' + esc(e.hoTen) + '</option>'; });
+        roleSel.innerHTML = opts;
+        roleSel.value = cur;
+        if (roleSel.value !== cur) roleSel.value = '';
+      }
+      function session() {
+        var v = roleSel.value;
+        if (v === 'quan_ly') return { vaiTro: 'quan_ly' };
+        if (v.indexOf('nv:') === 0) return { vaiTro: 'nhan_vien', nhanVienId: v.slice(3) };
+        return null;
+      }
+      function mountForm() {
+        if (ctrl) ctrl.destroy();
+        ctrl = DncEntry.mount(app, {
+          store: store, session: session(),
+          mode: editId ? 'edit' : 'add', id: editId,
+          onSaved: function () { renderList(); },
+          onCancel: editId ? function () { editId = null; mountForm(); } : null
+        });
+      }
+      function renderList() {
+        var box = document.getElementById('sh-items');
+        var r = store.listDeNghi();
+        var nv = store.listNhanVien();
+        var names = {};
+        if (nv.ok) nv.data.forEach(function (e) { names[e.id] = e.hoTen; });
+        if (!r.ok) { box.textContent = 'Không đọc được dữ liệu (' + r.error + ')'; return; }
+        if (!r.data.length) { box.textContent = 'Chưa có đề nghị nào.'; return; }
+        box.innerHTML = r.data.slice().reverse().map(function (x) {
+          return '<div class="sh-item"><div><b>' + esc(x.nhaCungCap) + '</b><small>' + esc(names[x.nhanVienId] || x.nhanVienId) + ' · ' + esc(DncModel.danhMucTen(x.danhMuc)) + ' · ' + esc(x.ngay) + ' · ' + esc(x.trangThai) + '</small></div>' +
+            '<div style="text-align:right"><b>' + DncModel.formatVND(DncModel.thanhTienOf(x)) + '</b><br>' +
+            (x.trangThai === 'cho_duyet' ? '<button type="button" data-edit="' + esc(x.id) + '">Sửa</button>' : '') + '</div></div>';
+        }).join('');
+      }
+      document.getElementById('sh-items').addEventListener('click', function (e) {
+        var b = e.target.closest('[data-edit]');
+        if (!b) return;
+        editId = b.getAttribute('data-edit');
+        mountForm();
+        window.scrollTo(0, 0);
+      });
+      document.getElementById('sh-seed').addEventListener('click', function () {
+        var l = store.listNhanVien();
+        if (l.ok && l.data.length) return;
+        localStorage.setItem(DncStore.KEY_NV, JSON.stringify([
+          { id: 'nv1', ma: 'NV001', hoTen: 'Nguyễn Văn An', hoatDong: true },
+          { id: 'nv2', ma: 'NV002', hoTen: 'Trần Thị Bình', hoatDong: true },
+          { id: 'nv3', ma: 'NV003', hoTen: 'Lê Hoàng Cường', hoatDong: true }
+        ]));
+        fillRoles(); editId = null; mountForm();
+      });
+      document.getElementById('sh-clear').addEventListener('click', function () {
+        if (!confirm('Xóa toàn bộ dữ liệu thử (nhân viên và đề nghị)?')) return;
+        localStorage.removeItem(DncStore.KEY_NV);
+        localStorage.removeItem(DncStore.KEY_DN);
+        fillRoles(); editId = null; mountForm(); renderList();
+      });
+      roleSel.addEventListener('change', function () { editId = null; mountForm(); });
+
+      fillRoles(); mountForm(); renderList();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Sổ Đề Nghị Chi</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="../nhap-lieu/css/entry.css">
+  <link rel="stylesheet" href="../duyet/css/review.css">
+  <link rel="stylesheet" href="../thong-ke/css/stats.css">
+  <link rel="stylesheet" href="../nhan-vien/css/emp.css">
+  <link rel="stylesheet" href="css/app.css">
+  <style>html { color-scheme: light dark; } body { margin: 0; background: var(--bg); }</style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <!-- Module 1: Nhập liệu chi -->
+  <script src="../nhap-lieu/js/entry-model.js"></script>
+  <script src="../nhap-lieu/js/entry-store.js"></script>
+  <script src="../nhap-lieu/js/entry-view.js"></script>
+  <!-- Module 2: Duyệt đề nghị -->
+  <script src="../duyet/js/review-model.js"></script>
+  <script src="../duyet/js/review-store.js"></script>
+  <script src="../duyet/js/review-view.js"></script>
+  <!-- Module 3: Thống kê -->
+  <script src="../thong-ke/js/stats-model.js"></script>
+  <script src="../thong-ke/js/stats-store.js"></script>
+  <script src="../thong-ke/js/stats-view.js"></script>
+  <!-- Module 4: Nhân viên -->
+  <script src="../nhan-vien/js/emp-model.js"></script>
+  <script src="../nhan-vien/js/emp-store.js"></script>
+  <script src="../nhan-vien/js/emp-view.js"></script>
+  <!-- Module 5: Khung ứng dụng -->
+  <script src="js/app-model.js"></script>
+  <script src="js/app-shell.js"></script>
+  <script src="js/app-modules.js"></script>
+  <script>
+    (function () {
+      var storage;
+      try { storage = window.localStorage; storage.getItem('dnc:v1:probe'); } catch (e) { storage = null; }
+      if (!storage) { // trình duyệt chặn hoàn toàn: dùng bộ nhớ tạm để app vẫn chạy (banner sẽ cảnh báo)
+        var mem = {}; storage = { getItem: function (k) { return k in mem ? mem[k] : null; }, setItem: function () { throw new Error('SecurityError'); }, removeItem: function (k) { delete mem[k]; } };
+      }
+      window.dncApp = DncApp.start(document.getElementById('app'), { storage: storage, modules: DncAppModules.real(storage) });
+    })();
+  </script>
+</body>
+</html>

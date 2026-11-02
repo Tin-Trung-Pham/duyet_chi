@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Duyệt đề nghị</title>
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/review.css">
+  <style>
+    /* Khung thử nghiệm – KHÔNG thuộc module. Thanh đầu trang/điều hướng thật thuộc module khác. */
+    html { color-scheme: light dark; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 15px; line-height: 22px; }
+    .sh-top { height: 56px; display: flex; align-items: center; padding: 0 16px; background: var(--surface); border-bottom: 1px solid var(--border); font-weight: 700; }
+    .sh-dev { max-width: 1120px; margin: 16px auto 0; padding: 12px 16px; font-size: 13px; line-height: 18px; color: var(--text-muted); background: var(--surface); border: 1px dashed var(--border); border-radius: 14px; }
+    .sh-dev strong { color: var(--text); }
+    .sh-dev .sh-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+    .sh-dev select, .sh-dev button { font: inherit; font-size: 13px; min-height: 36px; padding: 0 10px; color: var(--text); background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; cursor: pointer; }
+    .sh-wrap { margin: 0 12px; }
+  </style>
+</head>
+<body>
+  <div class="sh-top">Sổ Đề Nghị Chi</div>
+
+  <div class="sh-wrap"><div class="sh-dev">
+    <strong>Khung thử nghiệm</strong> (không thuộc module Duyệt). Danh bạ nhân viên, vai trò và đề nghị thật thuộc các module khác.
+    <div class="sh-row">
+      <label for="sh-role">Giả lập vai trò:</label>
+      <select id="sh-role">
+        <option value="quan_ly">Quản lý</option>
+        <option value="nhan_vien">Nhân viên (bị chặn)</option>
+      </select>
+      <button type="button" id="sh-seed">Nạp dữ liệu mẫu</button>
+      <button type="button" id="sh-clear">Xóa dữ liệu thử</button>
+    </div>
+  </div></div>
+
+  <div id="app"></div>
+
+  <script src="js/review-model.js"></script>
+  <script src="js/review-store.js"></script>
+  <script src="js/review-view.js"></script>
+  <script>
+    (function () {
+      var store = DncReviewStore.create({ storage: window.localStorage });
+      var app = document.getElementById('app');
+      var roleSel = document.getElementById('sh-role');
+      var ctrl = null;
+
+      function mountPage() {
+        if (ctrl) ctrl.destroy();
+        var role = roleSel.value;
+        ctrl = DncReview.mount(app, {
+          store: store,
+          session: role === 'quan_ly' ? { vaiTro: 'quan_ly' } : { vaiTro: 'nhan_vien', nhanVienId: 'nv1' }
+        });
+      }
+
+      function dayStr(offset) {
+        var d = new Date(); d.setDate(d.getDate() + offset);
+        return DncReviewModel.todayStr(d);
+      }
+      function iso(offset) { var d = new Date(); d.setDate(d.getDate() + offset); return d.toISOString(); }
+
+      document.getElementById('sh-seed').addEventListener('click', function () {
+        if (localStorage.getItem(DncReviewStore.KEY_DN) && !confirm('Đã có dữ liệu đề nghị. Ghi đè bằng dữ liệu mẫu?')) return;
+        localStorage.setItem(DncReviewStore.KEY_NV, JSON.stringify([
+          { id: 'nv1', ma: 'NV001', hoTen: 'Nguyễn Văn An', hoatDong: true },
+          { id: 'nv2', ma: 'NV002', hoTen: 'Trần Thị Bình', hoatDong: true },
+          { id: 'nv3', ma: 'NV003', hoTen: 'Lê Hoàng Cường', hoatDong: true }
+        ]));
+        function mk(i, nv, ncc, dm, sl, dg, ago, wait, gc) {
+          return { id: 'dn_seed' + i, nhanVienId: nv, nhaCungCap: ncc, danhMuc: dm, soLuong: sl, donGia: dg,
+            ngay: dayStr(-ago), ghiChu: gc || '', trangThai: 'cho_duyet', lyDoTuChoi: null, ngayTao: iso(-wait), ngayXuLy: null };
+        }
+        localStorage.setItem(DncReviewStore.KEY_DN, JSON.stringify([
+          mk(1, 'nv1', 'Giấy A4 Double A – Công ty Hồng Hà', 'van_phong_pham', 20, 85000, 5, 5, 'Cần giao trước thứ Sáu'),
+          mk(2, 'nv2', 'Máy in Canon LBP 2900', 'thiet_bi', 1, 4850000, 4, 4),
+          mk(3, 'nv1', 'Cước vận chuyển hàng Hà Nội – TP.HCM', 'van_chuyen', 1, 1250000, 2, 2),
+          mk(4, 'nv3', 'Tiếp khách đối tác (cà phê, bánh)', 'tiep_khach', 6, 120000, 1, 1, 'Họp với đối tác ngày 05/11'),
+          mk(5, 'nv2', 'Bảo trì điều hòa văn phòng', 'dich_vu', 3, 650000, 0, 0),
+          mk(6, 'nv3', 'Vật tư đóng gói (băng keo, thùng carton)', 'vat_tu', 2.5, 320000, 0, 0),
+          { id: 'dn_seed7', nhanVienId: 'nv1', nhaCungCap: 'Bút bi Thiên Long (khoản cũ đã duyệt)', danhMuc: 'van_phong_pham', soLuong: 100, donGia: 4500,
+            ngay: dayStr(-3), ghiChu: '', trangThai: 'da_duyet', lyDoTuChoi: null, ngayTao: iso(-3), ngayXuLy: iso(-2), nguoiXuLy: 'quan_ly' }
+        ]));
+        ctrl.refresh();
+      });
+      document.getElementById('sh-clear').addEventListener('click', function () {
+        if (!confirm('Xóa toàn bộ dữ liệu thử (nhân viên và đề nghị)?')) return;
+        localStorage.removeItem(DncReviewStore.KEY_NV);
+        localStorage.removeItem(DncReviewStore.KEY_DN);
+        ctrl.refresh();
+      });
+      roleSel.addEventListener('change', mountPage);
+      mountPage();
+    })();
+  </script>
+</body>
+</html>

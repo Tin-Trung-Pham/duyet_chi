@@ -1,0 +1,5 @@
+Dựa trên PRD.MD và DESIGN.MD, hãy xây dựng module  Nhập liệu chi.
+Đây là module thứ 1  trong tổng số module cần xây cho ứng dụng này
+Chỉ tập trung xây module này, CHƯA cần đụng tới các module khác đã xây hoặc chưa xây.
+Giao diện cần tuân theo đúng mô tả trong DESIGN.MD (bố cục, màu sắc, font).
+Trả về code đầy đủ, có tạo các test case nghiêm ngặt của module và thử nghiệm qua các test case đảm bảo không có lỗi nào phát sinh.
