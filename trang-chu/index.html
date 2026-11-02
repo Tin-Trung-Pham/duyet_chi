@@ -36,6 +36,7 @@
   <!-- Cơ sở dữ liệu (products.db qua server/server.py) -->
   <script src="../database/js/db-client.js"></script>
   <script src="../database/js/db-panel.js"></script>
+  <script src="../du-lieu-mau/sample-data.js"></script>
   <script src="js/app-model.js"></script>
   <script src="js/app-shell.js"></script>
   <script src="js/app-modules.js"></script>
@@ -46,6 +47,15 @@
       if (!storage) { // trình duyệt chặn hoàn toàn: dùng bộ nhớ tạm để app vẫn chạy (banner sẽ cảnh báo)
         var mem = {}; storage = { getItem: function (k) { return k in mem ? mem[k] : null; }, setItem: function () { throw new Error('SecurityError'); }, removeItem: function (k) { delete mem[k]; } };
       }
+      // Lần đầu mở (chưa có nhân viên/đề nghị nào và chưa từng nạp mẫu): tự nạp dữ liệu mẫu để xem ngay. Cờ demo ngăn nạp lại sau khi người dùng xóa dữ liệu.
+      try {
+        if (storage.getItem('dnc:v1:ui:demo') == null && storage.getItem('dnc:v1:nhanVien') == null && storage.getItem('dnc:v1:deNghi') == null) {
+          var demo = DncSample.build();
+          storage.setItem('dnc:v1:nhanVien', JSON.stringify(demo.nhanVien));
+          storage.setItem('dnc:v1:deNghi', JSON.stringify(demo.deNghi));
+          storage.setItem('dnc:v1:ui:demo', '1');
+        }
+      } catch (e) { /* không ghi được: bỏ qua, ứng dụng chạy như thường */ }
       // API nằm cạnh thư mục ứng dụng: http://127.0.0.1:8000/api/ khi chạy server/server.py (trên GitHub Pages không có → panel báo "chưa kết nối").
       var client = DncDb.createClient({ base: new URL('../api/', document.baseURI).href });
       var sync = DncDb.createSync({ client: client, storage: storage });

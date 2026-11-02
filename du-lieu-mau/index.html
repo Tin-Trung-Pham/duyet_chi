@@ -36,6 +36,7 @@
     <div class="row"><a class="link primary" id="go" href="../trang-chu/">Mở ứng dụng</a></div>
     <div class="card" style="margin-top:16px">
       <ul>
+        <li>Lần đầu mở ứng dụng trên một trình duyệt chưa có dữ liệu, dữ liệu mẫu được nạp tự động (chỉ một lần).</li>
         <li>Nạp dữ liệu mẫu sẽ <strong>ghi đè</strong> nhân viên và đề nghị chi hiện có trong trình duyệt này.</li>
         <li>Nếu đang chạy <code>python3 server/server.py</code>, dữ liệu cũng được ghi vào <code>products.db</code> (không xóa dòng nào có sẵn trong đó).</li>
       </ul>
@@ -52,7 +53,7 @@
       $('load').addEventListener('click', async function () {
         if ((count(K.NV) || count(K.DN)) && !confirm('Ghi đè dữ liệu hiện có bằng dữ liệu mẫu?')) return;
         var d = DncSample.build();
-        try { localStorage.setItem(K.NV, JSON.stringify(d.nhanVien)); localStorage.setItem(K.DN, JSON.stringify(d.deNghi)); }
+        try { localStorage.setItem(K.NV, JSON.stringify(d.nhanVien)); localStorage.setItem(K.DN, JSON.stringify(d.deNghi)); localStorage.setItem('dnc:v1:ui:demo', '1'); }
         catch (e) { say('Không ghi được vào trình duyệt: ' + e.message); return; }
         show();
         var msg = 'Đã nạp ' + d.nhanVien.length + ' nhân viên và ' + d.deNghi.length + ' đề nghị chi.';
