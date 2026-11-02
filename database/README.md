@@ -13,6 +13,9 @@ Chỉ cần Python 3 (đã thử với 3.11), **không cài thêm thư viện**.
 
 > Máy chủ chỉ lắng nghe `127.0.0.1` (một máy). **Không dùng được trên GitHub Pages**: ở đó ứng dụng vẫn chạy bằng localStorage, còn khối tổng hợp hiện "Chưa kết nối".
 
+## Dữ liệu ví dụ (10 nhân viên, ~90 đề nghị)
+Mở `http://127.0.0.1:8000/du-lieu-mau/` rồi bấm **Nạp dữ liệu mẫu** (ghi đè dữ liệu trong trình duyệt; có hỏi xác nhận). Dữ liệu được ghi cả vào `products.db` khi máy chủ đang chạy. Chi tiết: [du-lieu-mau/](../du-lieu-mau/). Test: `du-lieu-mau/run-tests.sh`.
+
 ## Bảng `products`
 | Cột | Kiểu | Ý nghĩa |
 |---|---|---|

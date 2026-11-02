@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Nạp dữ liệu mẫu</title>
+  <link rel="stylesheet" href="../trang-chu/css/tokens.css">
+  <style>
+    html { color-scheme: light dark; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 15px; line-height: 22px; }
+    main { max-width: 640px; margin: 0 auto; padding: 32px 16px; }
+    h1 { margin: 0 0 8px; font-size: 22px; line-height: 28px; }
+    p { margin: 0 0 16px; color: var(--text-muted); }
+    .card { padding: 16px; margin-bottom: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+    .row { display: flex; flex-wrap: wrap; gap: 12px; }
+    button, .link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; font: inherit; font-weight: 600; border-radius: 10px; border: 1px solid transparent; cursor: pointer; text-decoration: none; }
+    .primary { color: var(--primary-contrast); background: var(--primary); }
+    .plain { color: var(--text); background: var(--surface-2); }
+    button:focus-visible, .link:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+    #msg { min-height: 22px; margin: 0; color: var(--text); }
+    ul { margin: 0; padding-left: 20px; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Nạp dữ liệu mẫu</h1>
+    <p>Tạo <strong>10 nhân viên</strong> và khoảng <strong>90 đề nghị chi</strong> trong 4 tháng gần đây (đủ chờ duyệt / đã duyệt / từ chối, có khoản trên 100 triệu) để thử các màn hình và biểu đồ.</p>
+    <div class="card">
+      <p id="cur">Đang kiểm tra dữ liệu hiện có…</p>
+      <div class="row">
+        <button class="primary" id="load" type="button">Nạp dữ liệu mẫu</button>
+        <button class="plain" id="clear" type="button">Xóa toàn bộ dữ liệu trong trình duyệt</button>
+      </div>
+    </div>
+    <p id="msg" role="status" aria-live="polite"></p>
+    <div class="row"><a class="link primary" id="go" href="../trang-chu/">Mở ứng dụng</a></div>
+    <div class="card" style="margin-top:16px">
+      <ul>
+        <li>Nạp dữ liệu mẫu sẽ <strong>ghi đè</strong> nhân viên và đề nghị chi hiện có trong trình duyệt này.</li>
+        <li>Nếu đang chạy <code>python3 server/server.py</code>, dữ liệu cũng được ghi vào <code>products.db</code> (không xóa dòng nào có sẵn trong đó).</li>
+      </ul>
+    </div>
+  </main>
+  <script src="../database/js/db-client.js"></script>
+  <script src="sample-data.js"></script>
+  <script>
+    (function () {
+      var K = DncSample.KEYS, $ = function (id) { return document.getElementById(id); };
+      function count(key) { try { var d = JSON.parse(localStorage.getItem(key) || '[]'); return Array.isArray(d) ? d.length : 0; } catch (e) { return 0; } }
+      function show() { $('cur').textContent = 'Hiện có ' + count(K.NV) + ' nhân viên và ' + count(K.DN) + ' đề nghị chi trong trình duyệt này.'; }
+      function say(t) { $('msg').textContent = t; }
+      $('load').addEventListener('click', async function () {
+        if ((count(K.NV) || count(K.DN)) && !confirm('Ghi đè dữ liệu hiện có bằng dữ liệu mẫu?')) return;
+        var d = DncSample.build();
+        try { localStorage.setItem(K.NV, JSON.stringify(d.nhanVien)); localStorage.setItem(K.DN, JSON.stringify(d.deNghi)); }
+        catch (e) { say('Không ghi được vào trình duyệt: ' + e.message); return; }
+        show();
+        var msg = 'Đã nạp ' + d.nhanVien.length + ' nhân viên và ' + d.deNghi.length + ' đề nghị chi.';
+        var sync = DncDb.createSync({ client: DncDb.createClient({ base: new URL('../api/', document.baseURI).href }), storage: localStorage, doc: null, win: null, retryMs: 0 });
+        await sync.reconcile(); var s = sync.getState();
+        say(msg + (s.state === 'synced' ? ' Đã ghi vào products.db.' : ' (Chưa ghi vào products.db: máy chủ chưa chạy. Mở ứng dụng khi máy chủ chạy để tự đồng bộ.)'));
+      });
+      $('clear').addEventListener('click', function () {
+        if (!confirm('Xóa nhân viên và đề nghị chi trong trình duyệt này? (products.db không bị xóa)')) return;
+        localStorage.removeItem(K.NV); localStorage.removeItem(K.DN); show(); say('Đã xóa dữ liệu trong trình duyệt.');
+      });
+      show();
+    })();
+  </script>
+</body>
+</html>
